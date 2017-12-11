@@ -7,13 +7,13 @@ with open('input') as f:
     nest_level = 0
     score = 0
     removed_garbage = 0
-    pending_question_mark = False
+    pending_exclamation_mark = False
     for c in stream:
-        if pending_question_mark:
-            pending_question_mark = False
+        if pending_exclamation_mark:
+            pending_exclamation_mark = False
             continue
         if c == '!':
-            pending_question_mark = True
+            pending_exclamation_mark = True
             continue
         if inside_garbage:
             if c == '>':
