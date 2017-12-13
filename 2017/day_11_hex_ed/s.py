@@ -41,9 +41,14 @@ direct = {
         }
 
 def get_pos(coord):
-    return  (abs(org[0]) +  abs(org[1])) // 2
+    x = abs(coord[0])
+    y = abs(coord[1])
+    if x >= y:
+        return x
+    else:
+        return (x + y) // 2
 
-with open('input') as f:
+with open('input3') as f:
     org = [0, 0]
     max_step_away = 0
     directions = f.readline().rstrip().split(',')
