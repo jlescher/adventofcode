@@ -15,12 +15,12 @@ def left_rotate(n, l):
 def right_rotate(n, l):
     return left_rotate(-n, l)
 
-with open('input', mode='rb') as f:
+def knot_hash(string):
     circular_buffer = [ x for x in range(BUF_LEN) ]
     skip_size = 0
     left_shift = 0
     # Not sure what am I doing but it seems to do the job
-    lengths = list(map(ord, map(chr, f.read().rstrip()))) + END_LIST
+    lengths = list(map(ord, string.rstrip())) + END_LIST
     for _ in range(64):
         for length in lengths:
             circular_buffer[0:length] = circular_buffer[0:length][::-1]
@@ -36,8 +36,12 @@ with open('input', mode='rb') as f:
             xor = xor ^ circular_buffer[j]
         dense_hash.append(xor)
     assert(len(dense_hash) == 16 )
+    return dense_hash
 
-    a = ''
-    for e in  dense_hash:
-        a += '{:02x}'.format(e)
-    print(a)
+if __name__ == '__main__':
+    with open('input', mode='rb') as f:
+        dense_hash = knot_hash(f.read().decode('ascii'))
+        a = ''
+        for e in  dense_hash:
+            a += '{:02x}'.format(e)
+        print(a)
