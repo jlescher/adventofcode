@@ -1,8 +1,16 @@
-# Because there should always be a README
+# Purpose
 
-My own solution of the "advent of code" puzzle series.
+Practical python-training on a series of algorithmic puzzles.
 
-# Advent of code
+
+# Audience
+
+This is of poor interest in it-self.
+
+Any comments from pythonistas are welcomed! (to help me get better)
+
+
+# Advent of code 
 
 quote from http://adventofcode.com/2017/about
 
