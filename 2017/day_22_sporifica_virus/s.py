@@ -21,14 +21,22 @@ def get_middle(grid):
 
 def step(pos, direction, cnt, grid):
     # Get new direction and toggle node
-    if pos in grid:
-        direction = (direction + 1) % 4
-        grid.remove(pos)
-    else:
+    node_status = grid.get(pos, '.')
+    if node_status == '.':
         direction = (direction - 1) % 4
-        grid.add(pos)
+        grid[pos] = 'W'
+    elif node_status == 'W':
+        grid[pos] = '#'
         cnt += 1
-    # Move forward
+    elif node_status == '#':
+        direction = (direction + 1) % 4
+        grid[pos] = 'F'
+    elif node_status == 'F':
+        direction = (direction + 2) % 4
+        grid[pos] = '.'
+    else:
+        raise(Exception)
+    # Get the new position
     if direction == UP:
         pos = pos[0] , pos[1] + 1
     elif direction == RIGHT:
@@ -42,23 +50,34 @@ def step(pos, direction, cnt, grid):
     return  pos, direction, cnt
 
 
+def display(grid, pos):
+    xmin = min(grid.keys(), key = lambda x: x[0])[0]
+    xmax = max(grid.keys(), key = lambda x: x[0])[0]
+    ymin = min(grid.keys(), key = lambda x: x[1])[1]
+    ymax = max(grid.keys(), key = lambda x: x[1])[1]
+    for y in range(ymax, ymin-1, -1):
+        for x in range(xmin, xmax+1):
+            print(grid.get((x, y), '.'), end='')
+        print()
+    print()
+    print()
+
+
 with open('input') as f:
     grid_list = [ l.rstrip('\n') for l in f ]
-    grid_list.reverse()
-    grid_set = set()
+    grid_dict = {}
 
     # Set of infected nodes in an orthonormal 
-    ymin = - (len(grid_list)    // 2)
-    xmin = - (len(grid_list[0]) // 2)
-    for y, l in enumerate(grid_list, ymin):
-        for x, char in enumerate(l, xmin):
-            if char == '#':
-                grid_set.add((x, y))
+    half_size = len(grid_list) // 2
+    for y, l in enumerate(grid_list):
+        for x, char in enumerate(l):
+            grid_dict[(x-half_size, half_size-y)] = char
 
     cnt = 0
     pos = (0, 0)
     direction = UP
-    for _ in range(10000):
-        pos, direction, cnt = step(pos, direction, cnt, grid_set)
+    display(grid_dict, pos)
+    for _ in range(10000000):
+        pos, direction, cnt = step(pos, direction, cnt, grid_dict)
     print(cnt)
 
