@@ -20,6 +20,6 @@ with open('input') as f:
             else:
                 connected_components[node] = left_cc
 
-    print('programs PID0\'s group: {}'.format(list(connected_components.values()).count(connected_components['0'])))
-    print('number of groups: {}'.format(len(set(connected_components.values()))))
+    print('P1: {}'.format(list(connected_components.values()).count(connected_components['0'])))
+    print('P2: {}'.format(len(set(connected_components.values()))))
     
