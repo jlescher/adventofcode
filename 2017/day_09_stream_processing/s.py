@@ -34,5 +34,5 @@ with open('input') as f:
             else:
                 continue
     assert(nest_level == 0)
-    print('score: {}'.format(score))
-    print('garbage: {}'.format(removed_garbage))
+    print('P1:', score)
+    print('P2:', removed_garbage)
