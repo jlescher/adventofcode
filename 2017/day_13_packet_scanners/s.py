@@ -13,6 +13,14 @@ def got_caught(initial, layers):
             return True
     return False
 
+def get_safe_trip(layers):
+    delay = 0
+    # It could possibly be an infinite loop
+    # To be safe, we could define the upper bound as the PPCM of all the layers' number
+    while got_caught(delay, layers):
+        delay += 1
+    return delay
+
 def get_scanner_position(scan_range, picoseconds):
     num_pos = (scan_range - 1)  * 2
     mod = picoseconds % num_pos
@@ -26,10 +34,5 @@ with open('input') as f:
     for l in f.readlines():
         num,  depth = map(int, l.rstrip().split(': '))
         layers[num] = depth
-
-    delay = 0
-    # It could possibly be an infinite loop
-    # To be safe, we could define the upper bound as the PPCM of all the layers' number
-    while got_caught(delay, layers):
-        delay += 1
-    print(delay)
+    print('P1:', get_severity(layers))
+    print('P2:', get_safe_trip(layers))
