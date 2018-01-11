@@ -48,12 +48,12 @@ def get_pos(coord):
     else:
         return (x + y) // 2
 
-with open('input3') as f:
+with open('input') as f:
     org = [0, 0]
     max_step_away = 0
     directions = f.readline().rstrip().split(',')
     for d in directions:
         direct[d](org)
         max_step_away = max(max_step_away, get_pos(org))
-    print('max_step_away: {}'.format(max_step_away))
-    print('step_away: {}'.format(get_pos(org)))
+    print('P1:', get_pos(org))
+    print('P2:', max_step_away)
