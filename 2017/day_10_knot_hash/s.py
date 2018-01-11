@@ -44,4 +44,4 @@ if __name__ == '__main__':
         a = ''
         for e in  dense_hash:
             a += '{:02x}'.format(e)
-        print(a)
+        print('P2:', a)
