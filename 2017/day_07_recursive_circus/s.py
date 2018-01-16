@@ -12,10 +12,7 @@ def explore_node(node_name, graph):
         if unbalanced_found:
             return True, weight
     # Check if the tower is balanced
-    try:
-        subnode_weights = [ graph[sub][2] for sub in graph[node_name][1] ]
-    except IndexError as e:
-        print('asdf')
+    subnode_weights = [ graph[sub][2] for sub in graph[node_name][1] ]
     counter = Counter(subnode_weights)
     if len(counter) == 0 or len(counter) == 1: # balanced
         pass
