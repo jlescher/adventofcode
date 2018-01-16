@@ -1,39 +1,41 @@
 #!/usr/bin/env python3
 
-def rotate(pos, direction):
-    if direction == 'L':
-        pos[2] = pos[2] - 1
-    else:
-        pos[2] = pos[2] + 1
-    pos[2] = pos[2] % 4
+import argparse
+from collections import deque
 
-def walk(pos, step, saved_pos):
-    for i in range(step):
-        if pos[2] == 0:
-            pos[1] += 1
-        elif pos[2] == 1:
-            pos[0] += 1
-        elif pos[2] == 2:
-            pos[1] -= 1
-        else:
-            pos[0] -= 1
-        cur_pos = (pos[0], pos[1])
-        if cur_pos in saved_pos:
-            return True, cur_pos
-        else:
-            saved_pos.add(cur_pos)
-    return False, None
+north = lambda x, y: (x  , y+1)
+east  = lambda x, y: (x+1, y  )
+south = lambda x, y: (x  , y-1)
+west  = lambda x, y: (x-1, y  )
 
-with open('input') as f:
-    saved_pos = { (0, 0) }
-    pos = [0,0,0]
-    instructions = f.read().rstrip().split(', ')
-    for ins in instructions:
-        direction = ins[0]
-        step = int(ins[1:])
-        rotate(pos, direction)
-        ret = walk(pos, step, saved_pos)
-        if ret[0]:
-            print(ret[1])
-            print(abs(ret[1][0]) + abs(ret[1][1]))
-            break
+def get_dist(pos):
+    return sum(map(abs, pos))
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('input', nargs='?', default='input', type=str)
+    args = parser.parse_args()
+
+    trigger_P2 = True
+    positions = set()
+    with open(args.input) as f:
+        instructions = f.read().rstrip().split(', ')
+
+        direction = deque([north, east, south, west])
+        pos = (0, 0)
+        for ins in instructions:
+            if ins[0] == 'L':
+                direction.rotate(1)
+            else:
+                direction.rotate(-1)
+            for _ in range(int(ins[1:])):
+                pos = direction[0](*pos)
+                if trigger_P2:
+                    if pos in positions:
+                        saved_pos = pos
+                        trigger_P2 = False
+                    else:
+                        positions.add(pos)
+        print('P1:', get_dist(pos))
+        print('P2:', get_dist(saved_pos))
