@@ -29,7 +29,11 @@ def get_keypad2():
     return keypad
 
 
-def dial(keypad, pos, instructions, directions):
+def dial(keypad, instructions, directions):
+    # Start on 5
+    for pos, num in keypad.items():
+        if num == '5':
+            break
     code = ''
     for ins in instructions:
         for d in ins:
@@ -57,5 +61,5 @@ if __name__ == '__main__':
             'R' : lambda x, y: (x  , y+1)
             }
 
-    print('P1:', dial(get_keypad1(), (2, 2), instructions, directions))
-    print('P2:', dial(get_keypad2(), (1, 1), instructions, directions))
+    print('P1:', dial(get_keypad1(), instructions, directions))
+    print('P2:', dial(get_keypad2(), instructions, directions))
