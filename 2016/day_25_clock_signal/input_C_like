@@ -1,0 +1,20 @@
+d += a + 4*633
+while (True) {
+	a = d
+		while(a != 0) {
+			b = a
+			a = 0
+			while(True){
+			c = 2
+			while (c > 0) {
+				if (b==0)
+					goto label_3
+				b -= 1
+				c -= 1
+			}
+			a += 1
+			}
+			label_3:
+			OUT 2-c
+		}
+}

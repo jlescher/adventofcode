@@ -1,0 +1,11 @@
+Reverse ingeneer the input code.
+
+1. From input to input_labels:
+Implement jumps with labels and gotos
+
+2. From input_labels to input_C
+Implement the code as C code with minimising the gotos
+
+3. Notice that we are looking at the binary representation of the input number!
+
+4. Find a so that bin(a+4*633) = '10'*n

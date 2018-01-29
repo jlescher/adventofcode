@@ -38,19 +38,9 @@ class Proc_toggle(foo.Proc):
                 raise(Exception())
         self.pc += 1
 
-    def run(self): # overload
-        cnt = 0
-        while 0 <= self.pc < len(self.prog):
-            getattr(self, self.prog[self.pc][0])(*self.prog[self.pc][1:])
-            cnt += 1
-        return self.get_val('a')
-
-
-
-
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('input_mul', nargs='?', default='input', type=str)
+    parser.add_argument('input', nargs='?', default='input_mul', type=str)
     args = parser.parse_args()
 
     with open(args.input) as f:
