@@ -2,6 +2,7 @@
 
 
 import argparse
+import string
 
 registers = {}
 
@@ -9,6 +10,7 @@ registers = {}
 class Proc:
 
     def __init__(self, prog, **kwargs):
+        prog = [ x.strip().split() for x in prog[:] ]
         self.prog = prog
         self.pc = 0
         self.registers = kwargs.copy()
@@ -20,7 +22,8 @@ class Proc:
             return self.registers.setdefault(x, 0)
 
     def cpy(self, x, y):
-        self.registers[y] = self.get_val(x)
+        if y in string.ascii_lowercase:
+            self.registers[y] = self.get_val(x)
         self.pc += 1
 
     def inc(self, x):
@@ -38,7 +41,7 @@ class Proc:
             self.pc += 1
 
     def run(self):
-        while 0 <= self.pc < len(prog):
+        while 0 <= self.pc < len(self.prog):
             getattr(self, self.prog[self.pc][0])(*self.prog[self.pc][1:])
         return self.get_val('a')
 
@@ -50,8 +53,6 @@ if __name__ == '__main__':
 
     with open(args.input) as f:
         prog = f.readlines()
-
-    prog = [ x.strip().split() for x in prog ]
 
     print('P1:', Proc(prog).run())
     print('P2:', Proc(prog, c=1).run())
