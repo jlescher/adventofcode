@@ -2,70 +2,55 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define BIG_ARRAY_SIZE 0x10000
-char input[BIG_ARRAY_SIZE];
-char big_array[BIG_ARRAY_SIZE];
-char big_array_alt[BIG_ARRAY_SIZE];
-
-int filter(char *out, char* in, int size)
-{
-        int i = 0; /* Index that runs through all elements of "in". */
-        int j = 0; /* Index of the first empty square of "out". */
-        while(i < size-1) {
-                if ( abs(in[i+1] - in [i]) == abs('A' - 'a')) {
-                        /* Pair collapses. */
-                        i += 2;
-                }
-                else {
-                        out[j] = in[i];
-                        j += 1;
-                        i += 1;
-                }
+void  add(char* stack, int *i, char c) {
+        if (*i > 0 && abs(stack[(*i) - 1] - c) == abs('A' - 'a')) {
+                        *i -= 1;
         }
-        /* Copy the left-overs. */
-        if (i == size - 1) {
-                out[j] = in[i];
-                j += 1;
+        else {
+                stack[*i] = c;
+                *i += 1;
         }
-
-        return j;
 }
 
-int p1(char *input, int size)
-{
-        memcpy(big_array, input, size);
-        char *in = big_array;
-        char *out = big_array_alt;
-        char *tmp;
-        int len = size;
-        int len_alt = 0;
-        int len_tmp = 0;
-        while (len != len_alt) {
-                len_alt = filter(out, in, len);
-                /* Alternate. */
-                tmp = out;
-                out = in;
-                in = tmp;
-                len_tmp = len_alt;
-                len_alt = len;
-                len = len_tmp;
-        }
-        return len;
-}
-
-int p1_char(char c, char *input, int size)
+int p1(char *in, int sz)
 {
         int i = 0;
         int j = 0;
+        char * stack;
 
-        /* Copy input to big_array by removing c and c +abs('a' - 'A') */
-        for (i=0; i<size; i++) {
-                if (input[i] != c && input[i] != c + abs('A' - 'a')) {
-                        big_array[j] = input[i];
+        stack = malloc(sz*sizeof(char));
+        if (stack == NULL) {
+                fprintf(stderr, "Cannot malloc\n");
+                exit(EXIT_FAILURE);
+        }
+
+        for(j = 0; j < sz; j++) {
+                add(stack, &i, in[j]);
+        }
+
+        return i;
+}
+
+
+int p1_char(char c, char *in, int sz)
+{
+        char *buf;
+        int i;
+        int j = 0;
+
+        buf = malloc(sz*sizeof(char));
+        if (buf == NULL) {
+                fprintf(stderr, "Cannot malloc\n");
+                exit(EXIT_FAILURE);
+        }
+        /* Copy in to big_array by removing c and c +abs('a' - 'A') */
+        for (i=0; i<sz; i++) {
+                if (in[i] != c && in[i] != c + abs('A' - 'a')) {
+                        buf[j] = in[i];
                         j += 1;
                 }
         }
-        return p1(big_array, j);
+        return p1(buf, j);
 }
 
 int p2(char *input, int size)
@@ -106,8 +91,10 @@ int p2(char *input, int size)
 
 int main(int argc, char* argv[])
 {
-        FILE *f = NULL;
-        int cnt;
+        FILE *fp = NULL;
+        char *in;
+        int sz;
+        int r_sz;
 
         /******** Fetch input */
         if (argc != 2) {
@@ -115,17 +102,29 @@ int main(int argc, char* argv[])
                 exit(EXIT_FAILURE);
         }
 
-        if ( (f = fopen(argv[1], "r")) == NULL) {
+        if ( (fp = fopen(argv[1], "r")) == NULL) {
                 printf("burn in hell\n");
         }
 
-        cnt = fread(input, 1, sizeof(big_array), f);
-        if (cnt == sizeof(big_array)) {
-                printf("big_array is not big enough.\n");
+        fseek(fp, 0L, SEEK_END);
+        sz = ftell(fp);
+        sz -= 1; /* New line. */
+        rewind(fp);
+
+        in = malloc(sz*sizeof(char));
+        if (in == NULL) {
+                fprintf(stderr, "Cannot malloc\n");
+                exit(EXIT_FAILURE);
+        }
+
+        r_sz = fread(in, 1, sz, fp);
+        if (sz != r_sz) {
+                fprintf(stderr, "Cannot read input\n");
+                exit(EXIT_FAILURE);
         }
 
         /* Beware of the trailing "\n" character! */
-        printf("P1: %d\n", p1(input, cnt-1));
-        printf("P2: %d\n", p2(input, cnt-1));
+        printf("P1: %d\n", p1(in, sz));
+        printf("P2: %d\n", p2(in, sz));
         return 0;
 }
