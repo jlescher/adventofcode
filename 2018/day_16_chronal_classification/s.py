@@ -29,12 +29,9 @@ class Device:
 
     def execute_prog(self, prog):
         self.set_registers(0, 0, 0, 0)
-        print(self.registers)
         if self.opcodes:
             for opcode, A, B, C in prog:
-                print(self.opcodes[opcode].__name__, '(', A, B, C, ')')
                 self.opcodes[opcode](A, B, C)
-                print(self.registers)
 
     def set_registers(self, A, B, C, D):
         self.registers = [ A, B, C, D ]

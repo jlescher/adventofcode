@@ -41,16 +41,12 @@ if __name__ == '__main__':
     parser.add_argument('input', nargs='?', default='input', type=str)
     args = parser.parse_args()
 
-    pos = []
-    r = re.compile(r'-?\d+')
     with open(args.input) as f:
-        for l in f:
-            m = r.findall(l)
-            if len(m) is not 4:
-                raise()
-            else:
-                pos.append( ( (int(m[0]), int(m[1])), (int(m[2]), int(m[3])) ) )
+        lines = f.readlines()
 
-    print('P1')
-    t = p(pos)
-    print('P2', t)
+    # Extract part1 input
+    tests = []
+    i = 0
+    while 'Before' in in lines[i]:
+        # Create the unit test
+
