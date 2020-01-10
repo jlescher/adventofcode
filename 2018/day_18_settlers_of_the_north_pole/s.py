@@ -27,30 +27,58 @@ def get_adjacent(x, y, area):
 
 
 
-def tick(area)
+def tick(area):
+    area_new  = [ list(l) for l in area ]
+    for x, l in enumerate(area):
+        for y, char in enumerate(l):
+            opened, wooded, lumberyard = get_adjacent(x, y, area)
+            if char == '.':
+                if wooded >= 3:
+                    area_new[x][y] = '|'
+            elif char == '|':
+                if lumberyard >= 3:
+                    area_new[x][y] = '#'
+            elif char == '#':
+                if not (lumberyard >= 1 and wooded >= 1):
+                    area_new[x][y] = '.'
+    return tuple(tuple(l) for l in area_new)
+
 def part1(area):
     # Do not touch the input
-    area_init = deepcopy(area)
-    area_new  = deepcopy(area)
-    #display(area_init)
+    area_new = deepcopy(area)
     for minute in range(10):
-        for x, l in enumerate(area_init):
-            for y, char in enumerate(l):
-                opened, wooded, lumberyard = get_adjacent(x, y, area_init)
-                if char == '.':
-                    if wooded >= 3:
-                        area_new[x][y] = '|'
-                elif char == '|':
-                    if lumberyard >= 3:
-                        area_new[x][y] = '#'
-                elif char == '#':
-                    if not (lumberyard >= 1 and wooded >= 1):
-                        area_new[x][y] = '.'
-        area_init = deepcopy(area_new)
-        #display(area_init)
-    cnt_wooded     = sum( [ x.count('|') for x in area_init ] )
-    cnt_lumberyard = sum( [ x.count('#') for x in area_init ] )
+        area_new = tick(area_new)
+    cnt_wooded     = sum( [ x.count('|') for x in area_new ] )
+    cnt_lumberyard = sum( [ x.count('#') for x in area_new ] )
     return cnt_wooded * cnt_lumberyard
+
+def part2(area):
+    # Do not touch the input
+    area_new = deepcopy(area)
+
+    states = {} # hashmap to detect repeating positions
+    states[area_new] = 0
+
+    cnt = 0
+    while True:
+        area_new = tick(area_new)
+        cnt += 1
+        try:
+            cnt_repeat = states[area_new]
+            break
+        except KeyError:
+            states[area_new] = cnt
+
+    cnt_ref = cnt_repeat + ( (1000000000 - cnt_repeat) % (cnt - cnt_repeat))
+    for k, v in states.items():
+        if v == cnt_ref:
+            area_new = k
+    cnt_wooded     = sum( [ x.count('|') for x in area_new ] )
+    cnt_lumberyard = sum( [ x.count('#') for x in area_new ] )
+    return cnt_wooded * cnt_lumberyard
+
+        
+        
         
 
 if __name__ == '__main__':
@@ -59,6 +87,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     with open(args.input) as f:
-        area = [ list(l.rstrip()) for l in f.readlines() ]
+        area = tuple( tuple(l.rstrip()) for l in f.readlines() )
     print('part1: {}'.format(part1(area)))
+    print('part2: {}'.format(part2(area)))
 
