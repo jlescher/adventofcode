@@ -6,8 +6,8 @@ from pprint import pprint
 from copy   import deepcopy
 
 class Device:
-    def __init__(self):
-        self.registers = [ 0 for i in range(4) ]
+    def __init__(self, num):
+        self.registers = [ 0 for i in range(num) ]
         self.instructions = [
                 self.addr,
                 self.addi,
@@ -26,12 +26,6 @@ class Device:
                 self.eqri,
                 self.eqrr,
                 ]
-
-    def execute_prog(self, prog):
-        self.set_registers(0, 0, 0, 0)
-        if self.opcodes:
-            for opcode, A, B, C in prog:
-                self.opcodes[opcode](A, B, C)
 
     def set_registers(self, A, B, C, D):
         self.registers = [ A, B, C, D ]
@@ -84,9 +78,14 @@ class Device:
     def eqrr(self, A, B, C):
         self.registers[C] = 1 if self.registers[A] == self.registers[B] else 0
 
+
+class Device_unknown_opcodes(Device):
+    def __init__(self):
+        super(Device_unknown_opcodes, self).__init__(4)
+
     def map_instructions_to_opcodes(self, tests):
         # Create a set for each opcode number
-        opcodes = [ set(self.instructions) for i in range(16)] 
+        opcodes = [ set(self.instructions) for i in range(len(self.instructions))] 
         for t in tests:
             opcode = t[1][0]
             is_valid = set()
@@ -116,8 +115,14 @@ class Device:
                 break
         assert len(set(self.opcodes)) == len(self.opcodes)
 
+    def execute(self, prog):
+        self.set_registers(0, 0, 0, 0)
+        if self.opcodes:
+            for opcode, A, B, C in prog:
+                self.opcodes[opcode](A, B, C)
+
 def part1(tests):
-    d = Device()
+    d = Device(4)
     cnt = 0
     for t in tests:
         cnt_i = 0
@@ -131,9 +136,9 @@ def part1(tests):
     return cnt
 
 def part2(tests, prog):
-    d = Device()
+    d = Device_unknown_opcodes(4)
     d.map_instructions_to_opcodes(tests)
-    d.execute_prog(prog)
+    d.execute(prog)
     return d.registers[0]
     
 
