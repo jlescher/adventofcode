@@ -3,9 +3,9 @@
 import argparse
 import sys
 import os
-import pprint
 import pdb
-from math import ceil, sqrt
+from pprint import pprint
+from math   import ceil, sqrt
 
 # Get the device from previous puzzle
 sys.path.append(os.path.realpath(os.path.dirname(__file__)) + '/../day_16_chronal_classification')
@@ -17,25 +17,22 @@ class Device_known_opcodes(device.Device):
         self.ip = ip
         self.instructions = { i.__name__: i for i in self.instructions }
 
+    def execute_instruction(self):
+        # print(self)
+        instruction = self.prog[self.registers[self.ip]]
+        self.instructions[instruction[0]](*instruction[1:])
+        self.registers[self.ip] += 1
+
     def execute(self, prog):
         self.prog = prog
-        pdb.set_trace()
+        #pdb.set_trace()
         while True:
-            # print(self)
             try:
-                instruction = self.prog[self.registers[self.ip]]
+                self.execute_instruction()
             except IndexError:
                 print('instruction pointer points out of program, exiting..')
                 break
-            self.instructions[instruction[0]](*instruction[1:])
-            self.registers[self.ip] += 1
 
-    #def __str__(self):
-    #    try:
-    #        instruction = self.prog[self.registers[self.ip]]
-    #    except IndexError:
-    #        instruction = 'out of range'
-    #    return "ip={} {} {}".format(self.registers[self.ip], self.registers, instruction)
     def __str__(self):
         s = 'registers = {}\n'.format(self.registers)
         # Put the arrow in the proper location
@@ -75,8 +72,12 @@ if __name__ == '__main__':
     with open(args.input) as f:
         prog = []
         for l in f.readlines():
-            ins, *args = l.rstrip().split()
-            prog.append(tuple([ins, *map(int, args)]))
-
-    #print('part1: {}'.format(part1(prog[0][1], prog[1:])))
+            l = l.rstrip().split()
+            ins = l[0]
+            args = list(map(int, l[1:]))
+            line = [ ins ]
+            line.extend(args)
+            prog.append(line)
+            
+    print('part0: {}'.format(part1(prog[0][1], prog[1:])))
     print('part2: {}'.format(part2(prog[0][1], prog[1:])))
