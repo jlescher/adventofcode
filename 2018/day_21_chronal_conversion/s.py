@@ -21,7 +21,7 @@ class Device_known_opcodes_monitor(device_opcodes.Device_known_opcodes):
         instruction = self.prog[self.registers[self.ip]]
         if self.registers[self.ip] == 28:
             if self.registers in self.states:
-                print('part2: self.states[-1][3])
+                print('part2:'.format(self.states[-1][3])
                 raise Exception('Loop detected')
             else:
                 self.states.append(self.registers[:])
