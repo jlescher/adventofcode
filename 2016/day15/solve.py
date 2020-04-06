@@ -24,7 +24,7 @@ def p(disks):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('input', nargs='?', default='input', type=str)
+    parser.add_argument('input', type=str)
     args = parser.parse_args()
 
     regex = re.compile(r'\D*(?P<num>\d*)\D*(?P<num_pos>\d*)\D*0\D*(?P<pos>\d*)\D*')

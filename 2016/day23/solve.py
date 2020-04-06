@@ -40,7 +40,7 @@ class Proc_toggle(foo.Proc):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('input', nargs='?', default='input_mul', type=str)
+    parser.add_argument('input', type=str)
     args = parser.parse_args()
 
     with open(args.input) as f:
