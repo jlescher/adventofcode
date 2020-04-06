@@ -30,11 +30,5 @@ if __name__ == '__main__':
     with open(args.input) as f:
         modules = [ int(l.rstrip()) for l in f ]
 
-    a = modules[:]
     print('part1: {}'.format(part1(modules)))
     print('part2: {}'.format(part2(modules)))
-        
-
-        
-
-
