@@ -5,14 +5,11 @@ import logging
 from collections import defaultdict
 from itertools import starmap
 
-logging.basicConfig(level=logging.DEBUG)
-
 class Intcode:
     POSITION  = 0
     IMMEDIATE = 1
 
     def __init__(self):
-        print('day05')
         self.pc = 0
         self.inc_pc  = True
         self.halted  = False
@@ -110,11 +107,12 @@ class Intcode:
             self.pc += 1 + self.opcodes[opcode]['param']
 
     def execute(self):
-        self.pc = 0
         while not self.halted:
             self.execute_instruction()
 
 if __name__ == '__main__':
+    logging.basicConfig(level=logging.DEBUG)
+
     parser = argparse.ArgumentParser()
     parser.add_argument('input', type=str)
     args = parser.parse_args()
