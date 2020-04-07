@@ -12,6 +12,7 @@ class Intcode:
     IMMEDIATE = 1
 
     def __init__(self):
+        print('day05')
         self.pc = 0
         self.inc_pc  = True
         self.halted  = False
