@@ -3,11 +3,9 @@
 import argparse
 import logging
 from collections import defaultdict
-from itertools import starmap
+from itertools import count
 
 class Intcode:
-    POSITION  = 0
-    IMMEDIATE = 1
 
     def __init__(self):
         self.pc = 0
@@ -23,6 +21,11 @@ class Intcode:
                 7:  { 'param': 3, 'func': self.less_than},
                 8:  { 'param': 3, 'func': self.equal},
                 99: { 'param': 0, 'func': self.halt},
+                }
+
+        self.read_param = {
+                0: { 'debug_str': 'p', 'func': lambda x: self.memory[x] },
+                1: { 'debug_str': 'i', 'func': lambda x: x },
                 }
 
     def add(self, a, b, c):
@@ -67,33 +70,35 @@ class Intcode:
         for i, j in enumerate(prog):
             self.memory[i] = j
 
+    def get_modes(self, raw_opcode, num_params):
+        raw_opcode //=100
+        modes = []
+        # Can we write that loop as a list comprehension
+        for i in range(num_params):
+            modes.append(raw_opcode % 10)
+            raw_opcode //=10
+        return modes
+
     def execute_instruction(self):
         # Fetch and decode opcode 
         raw_opcode = self.memory[self.pc]
         opcode = raw_opcode % 100
-        raw_opcode //= 100
         num_params = self.opcodes[opcode]['param']
 
         # Fetch and decode instruction
-        # Get the modes to fetch the values
-        modes = []
-        params = [] # parameter index in memory
-        for param in range(self.pc+1, self.pc+1+num_params):
-            # Read modes from right to left
-            mode = raw_opcode % 10
-            modes.append(raw_opcode % 10)
-            raw_opcode //= 10
-            if mode == self.POSITION:
-                params.append(self.memory[param])
-            else:
-                params.append(param)
+        modes = self.get_modes(raw_opcode, num_params)
+        params = [ self.read_param[mode]['func'](addr) for mode, addr in zip(modes, count(self.pc + 1)) ]
 
         # Logging 
         instruction = [ self.memory[x] for x in range(self.pc, self.pc + num_params + 1) ]
         logging.debug('-'*80)
         logging.debug('pc: ' + str(self.pc))
+        try:
+            logging.debug('rel_base: ' + str(self.rel_base))
+        except AttributeError:
+            pass
         logging.debug('raw  instruction: ' + '{:12d}  '.format(instruction[0])                        +  ''.join(map( lambda x: ' {:4d}'.format(x), instruction[1:])))
-        logging.debug('dec  instruction: ' + '{:>12s}  '.format(self.opcodes[opcode]['func'].__name__) + ''.join(map( lambda x: ' {:>4s}'.format(x),  map( lambda x, y: ('a', 'i')[x] + str(y), modes, instruction[1:]))))
+        logging.debug('dec  instruction: ' + '{:>12s}  '.format(self.opcodes[opcode]['func'].__name__) + ''.join(map( lambda x: ' {:>4s}'.format(x),  map( lambda x, y: self.read_param[x]['debug_str'] + str(y), modes, instruction[1:]))))
         logging.debug('mem  instruction: ' + '{:>12s}  '.format(self.opcodes[opcode]['func'].__name__) + ''.join(map( lambda x: ' {:4d}'.format(self.memory[x]), params)))
 
 

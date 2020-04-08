@@ -19,8 +19,10 @@ class Intcode(day05.Intcode):
         super(Intcode, self).__init__()
         self.in_queue  = in_queue
         self.out_queue = out_queue
-        self.opcodes[3] = { 'param': 1, 'func': self._input}
-        self.opcodes[4] = { 'param': 1, 'func': self.output}
+        self.opcodes.update( {
+            3: { 'param': 1, 'func': self._input},
+            4: { 'param': 1, 'func': self.output}
+            } )
         self.reset_memory(prog)
 
     def _input(self, a):
