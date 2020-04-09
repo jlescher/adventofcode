@@ -27,10 +27,6 @@ class VM:
     def halt(self):
         self.run = False
 
-    def set_noun_verb(self, noun, verb):
-        self.memory[1] = noun
-        self.memory[2] = verb
-
     def reset_memory(self, prog):
         self.memory = defaultdict(int)
         for i, j in enumerate(prog):
@@ -54,7 +50,8 @@ class VM:
 
 def run_noun_verb(noun, verb, prog):
     vm.reset_memory(prog)
-    vm.set_noun_verb(noun, verb)
+    vm.memory[1] = noun
+    vm.memory[2] = verb
     vm.execute()
     return vm.memory[0]
 

@@ -1,24 +1,14 @@
 #!/usr/bin/env python3
 
-import argparse
-import sys
-import os
-from itertools import permutations, chain, tee
+import argparse, sys, os
+from itertools   import permutations
 from collections import deque
 sys.path.append(os.path.dirname(os.getcwd()))
 from day05 import solve as day05
 
-def pairwise(iterable):
-    "s -> (s0,s1), (s1,s2), (s2, s3), ..."
-    a, b = tee(iterable)
-    next(b, None)
-    return zip(a, b)
-
 class VM(day05.VM):
-    def __init__(self, in_queue, out_queue, prog):
+    def __init__(self, prog):
         super(VM, self).__init__()
-        self.in_queue  = in_queue
-        self.out_queue = out_queue
         self.opcodes.update( {
             3: { 'param': 1, 'func': self._input},
             4: { 'param': 1, 'func': self.output}
@@ -33,17 +23,28 @@ class VM(day05.VM):
 
 # Poor man's threading
 def run(permutation, prog):
-    queues = [ deque([p]) for p in permutation ]
-    queues[0].appendleft(0)
-    vms = [ VM(in_queue, out_queue, prog) for in_queue, out_queue in pairwise(chain(queues, [ queues[0] ])) ]
+    pipes = [ deque([i]) for i in permutation ]
+    vms =   [ VM(prog) for _ in permutation ]
+
+    # Connect the vms
+    for pipe, vm in zip(pipes, vms):
+        vm.in_queue = pipe
+    for i in range(len(vms) - 1):
+        vms[i].out_queue = vms[i+1].in_queue
+    vms[-1].out_queue = vms[0].in_queue
+
+    # Send signal to first vm
+    vms[0].in_queue.appendleft(0)
     
     while not vms[-1].halted:
-        for x in vms:
+        for vm in vms:
             try:
-                x.execute()
+                vm.execute()
             except IndexError:
                 pass
-    return queues[0][0]
+
+    return vms[-1].out_queue.pop()
+
 
 def part1(prog):
     return max(run(p, prog) for p in permutations(range(5)))
@@ -61,7 +62,3 @@ if __name__ == '__main__':
 
     print('part1: {}'.format(part1(prog)))
     print('part2: {}'.format(part2(prog)))
-        
-
-
-

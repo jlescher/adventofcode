@@ -78,10 +78,15 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     with open(args.input) as f:
+        asteroids = set()
+        for y, line in enumerate(f):
+            for x, char in enumerate(line):
+                if char == '#':
+                    asteroids.add( (i, j) )
+
         asteroids = [ list(l.rstrip()) for l in f.readlines() ]
             
     # Get the list of asteroids coordinates
-    asteroids = set( [ (i, j) for j, x in enumerate(asteroids) for i,y  in enumerate(x) if y == '#' ] )
     ray_map = get_ray_map(asteroids)
 
     print('part1: {}'.format(part1(ray_map)))

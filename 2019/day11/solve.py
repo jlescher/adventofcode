@@ -56,10 +56,10 @@ def run(start_color, prog):
 
 def part2(prog):
     panel = run(Robot.WHITE, prog).panel
-    mini = min(panel, key = lambda x: x[0])[0]
-    maxi = max(panel, key = lambda x: x[0])[0]
-    minj = min(panel, key = lambda x: x[1])[1]
-    maxj = max(panel, key = lambda x: x[1])[1]
+    mini = min([ x[0] for x in panel ])
+    maxi = max([ x[0] for x in panel ])
+    minj = min([ x[1] for x in panel ])
+    minj = max([ x[1] for x in panel ])
     hull = []
     for j in range(minj, maxj+1):
         hull.append( [ panel.get((i, j), 0) for i in range(mini, maxi+1) ])

@@ -9,6 +9,7 @@ HIGH=765869
 
 part1_cnt = 0
 part2_cnt = 0
+
 for n in range(LOW, HIGH+1):
     # 6 digits
     if int(math.log10(n))+1 != 6:
@@ -25,7 +26,7 @@ for n in range(LOW, HIGH+1):
 
     part1_cnt += 1
 
-    # No 3 times the same digit
+    # At least once, only 2 digits
     conseq_digits = re.findall(r'((\d)\2+)', str_n)
     for conseq,_ in conseq_digits:
         if len(conseq) == 2:

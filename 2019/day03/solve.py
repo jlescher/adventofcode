@@ -45,7 +45,7 @@ if __name__ == '__main__':
         wires = []
         for l in f:
             l = l.rstrip().split(',')
-            l = list(map( lambda x: (x[0], int(x[1:])), l))
+            l = [ x[0], int(x[1:]) for x in l ]
             wires.append(l)
 
     wire1 = list(get_path(wires[0]))
