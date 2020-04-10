@@ -22,20 +22,6 @@ def get_path(wire):
             path.append((x, y))
     return path
 
-def part1(wires):
-    wire0 = set(get_path(wires[0]))
-    wire1 = set(get_path(wires[1]))
-    inter = wire0.intersection(wire1)
-    try:
-        inter.remove((0, 0))
-    except:
-        pass
-    return sum(map(abs, (min(common, key = lambda x: sum(map(abs, x))))))
-
-def part2(wires):
-    wire0 = set(get_path(wires[0]))
-    wire1 = set(get_path(wires[1]))
-
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('input', type=str)
