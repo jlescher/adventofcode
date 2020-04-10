@@ -9,10 +9,10 @@ import logging
 
 logging.basicConfig(level=logging.WARNING)
 
-class Intcode(day05.Intcode):
+class VM(day05.VM):
 
     def __init__(self):
-        super(Intcode, self).__init__()
+        super(VM, self).__init__()
         self.rel_base = 0
         
         self.read_param.update( { 2: { 'debug_str': 'r', 'func': lambda x: self.rel_base + self.memory[x] }})
@@ -29,6 +29,6 @@ if __name__ == '__main__':
     with open(args.input) as f:
         prog = list(map(int, f.readline().split(',')))
 
-    intcode = Intcode()
-    intcode.reset_memory(prog)
-    intcode.execute()
+    vm = VM()
+    vm.reset_memory(prog)
+    vm.execute()

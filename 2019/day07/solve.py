@@ -14,9 +14,9 @@ def pairwise(iterable):
     next(b, None)
     return zip(a, b)
 
-class Intcode(day05.Intcode):
+class VM(day05.VM):
     def __init__(self, in_queue, out_queue, prog):
-        super(Intcode, self).__init__()
+        super(VM, self).__init__()
         self.in_queue  = in_queue
         self.out_queue = out_queue
         self.opcodes.update( {
@@ -35,10 +35,10 @@ class Intcode(day05.Intcode):
 def run(permutation, prog):
     queues = [ deque([p]) for p in permutation ]
     queues[0].appendleft(0)
-    intcodes = [ Intcode(in_queue, out_queue, prog) for in_queue, out_queue in pairwise(chain(queues, [ queues[0] ])) ]
+    vms = [ VM(in_queue, out_queue, prog) for in_queue, out_queue in pairwise(chain(queues, [ queues[0] ])) ]
     
-    while not intcodes[-1].halted:
-        for x in intcodes:
+    while not vms[-1].halted:
+        for x in vms:
             try:
                 x.execute()
             except IndexError:

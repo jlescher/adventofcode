@@ -7,7 +7,7 @@ from day09 import solve as day09
 import matplotlib.pyplot as plt
 
 
-class Robot(day09.Intcode):
+class Robot(day09.VM):
     BLACK = 0
     WHITE = 1
 

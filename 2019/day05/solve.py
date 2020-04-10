@@ -5,7 +5,7 @@ import logging
 from collections import defaultdict
 from itertools import count
 
-class Intcode:
+class VM:
 
     def __init__(self):
         self.pc = 0
@@ -125,7 +125,7 @@ if __name__ == '__main__':
     with open(args.input) as f:
         prog = list(map(int, f.readline().split(',')))
 
-    intcode = Intcode()
-    intcode.reset_memory(prog)
-    intcode.execute()
+    vm = VM()
+    vm.reset_memory(prog)
+    vm.execute()
 

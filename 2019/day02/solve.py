@@ -6,7 +6,7 @@ from collections import defaultdict
 
 logging.basicConfig(level=logging.WARNING)
 
-class Intcode:
+class VM:
     def __init__(self):
         self.pc = 0
         self.run  = True
@@ -45,7 +45,7 @@ class Intcode:
 
     def __str__(self):
         if not self.memory:
-            return 'Intcode not initialized yet'
+            return 'VM not initialized yet'
 
         s = ''
         for i in range(max(self.memory)+1):
@@ -53,10 +53,10 @@ class Intcode:
         return s
 
 def run_noun_verb(noun, verb, prog):
-    intcode.reset_memory(prog)
-    intcode.set_noun_verb(noun, verb)
-    intcode.execute()
-    return intcode.memory[0]
+    vm.reset_memory(prog)
+    vm.set_noun_verb(noun, verb)
+    vm.execute()
+    return vm.memory[0]
 
 def part1(prog):
     return run_noun_verb(12, 2, prog)
@@ -76,7 +76,7 @@ if __name__ == '__main__':
     with open(args.input) as f:
         prog = list(map(int, f.readline().split(',')))
 
-    intcode = Intcode()
+    vm = VM()
     print('part1: {}'.format(part1(prog)))
     print('part2: {}'.format(part2(prog)))
         
