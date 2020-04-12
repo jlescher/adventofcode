@@ -12,7 +12,7 @@ def run(permutation, exe):
 
     # Connect the vms (out[i] -> input[i+1]) in daisy chain
     for i in range(len(vms)):
-        vms[i].register_func(vms[(i+1) % len(vms)].push_in)
+        vms[i].register_stream(vms[(i+1) % len(vms)].push_in)
 
     # Push in the permutation
     for vm, p in zip(vms, permutation):
