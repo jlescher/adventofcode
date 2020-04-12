@@ -12,12 +12,11 @@ if __name__ == '__main__':
             exe = list(map(int, f.readline().split(',')))
 
     vm = VM(exe)
-    out = vm.run_pack(1)[-1]
+    out = vm.run(1)
     
     print('part1: {}'.format(out))
 
-    vm.reset()
-    vm.reset_memory(exe)
-    out = vm.run_pack(5).pop()
+    vm = VM(exe)
+    out = vm.run(5)
     
     print('part2: {}'.format(out))

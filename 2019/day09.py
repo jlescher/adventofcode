@@ -13,7 +13,7 @@ if __name__ == '__main__':
         exe = list(map(int, f.readline().split(',')))
 
     vm = VM(exe)
-    print('part1: {}'.format(vm.run_stream(1)))
+    print('part1: {}'.format(vm.run(1)))
 
     vm = VM(exe)
-    print('part1: {}'.format(vm.run_stream(2)))
+    print('part1: {}'.format(vm.run(2)))

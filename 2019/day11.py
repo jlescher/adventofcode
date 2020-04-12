@@ -5,6 +5,7 @@ from collections import deque
 from lib.intcode import VM
 import matplotlib.pyplot as plt
 
+import pdb
 
 class Robot:
     BLACK = 0

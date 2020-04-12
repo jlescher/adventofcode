@@ -12,7 +12,7 @@ def run(permutation, exe):
 
     # Connect the vms (out[i] -> input[i+1]) in daisy chain
     for i in range(len(vms)):
-        vms[i].register_stream(vms[(i+1) % len(vms)].push_in)
+        vms[i].register_stream_func(vms[(i+1) % len(vms)].push_in)
 
     # Push in the permutation
     for vm, p in zip(vms, permutation):
@@ -24,9 +24,8 @@ def run(permutation, exe):
     # Run the poor man's scheduler
     while not vms[-1].halted:
         for vm in vms:
-            out = vm.run_stream()
+            out = vm.run()
     return out
-
 
 def part1(exe):
     return max(run(p, exe) for p in permutations(range(5)))

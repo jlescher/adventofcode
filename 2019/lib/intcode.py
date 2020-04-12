@@ -3,7 +3,7 @@
 import logging
 from collections import defaultdict, deque
 
-logging.basicConfig(level=logging.DEBUG)
+#logging.basicConfig(level=logging.DEBUG)
 
 class VM:
     '''
@@ -106,10 +106,7 @@ class VM:
         instruction = [ self.memory[x] for x in range(self.pc, self.pc + n_param + 1) ]
         logging.debug('-'*80)
         logging.debug('pc: ' + str(self.pc))
-        try:
-            logging.debug('rel_base: ' + str(self.rel_base))
-        except AttributeError:
-            pass
+        logging.debug('rel_base: ' + str(self.rel_base))
         logging.debug('raw  instruction: ' + '{:12d}  '.format(instruction[0])                        + ''.join(map( lambda x: ' {:4d}'.format(x), instruction[1:])))
         logging.debug('dec  instruction: ' + '{:>12s} '.format(self.opcodes[opcode]['func'].__name__) + ''.join(map( lambda x: ' {:>4s}'.format(x),  map( lambda x, y: self.read_param[x]['debug_str'] + str(y), modes, instruction[1:]))))
         logging.debug('mem  instruction: ' + '{:>12s} '.format(self.opcodes[opcode]['func'].__name__) + ''.join(map( lambda x: ' {:4d}'.format(self.memory[x]), params)))
@@ -147,29 +144,68 @@ class VM:
                 yield self.out
                 self.out = None
 
-    def register_stream(self, func=None):
+    def register_stream_func(self, func=None):
         self.func = func
 
-    def run_stream(self):
-        self.last = None
-        for i in self._run():
-            try:
-                # Redirect output
-                self.func(i)
-            except AttributeError:
-                pass
-            self.last = i
-        return self.last
-
-    def run_pack(self, *args):
+    def run_stream(self, *args):
         '''
-        Generator that yields output all at once when VM is halted or when new
-        input is required
+        Generator that yields each output as a stream as soon as it is available.
+        Meant to be used with:
+        > for out in vm.run_stream():
         '''
         if args:
             self.push_in(*args)
 
-        self.out_queue = []
         for i in self._run():
-            self.out_queue.append(i)
-        return (self.out_queue)
+            try:
+                # Apply func on the stream
+                self.func(i)
+            except AttributeError:
+                pass
+            yield i
+
+    def run(self, *args):
+        '''
+        Function that runs until the VM halts and return the last output value
+        Default to the returning the content of memory[0] if no output value
+        Meant to be used with:
+        > out = vm.run()
+        '''
+        if args:
+            self.push_in(*args)
+        for i in self.run_stream():
+            out = i
+        try:
+            return i
+        except UnboundLocalError:
+            return self.memory[0]
+
+    def _run_pack(self):
+        '''
+        Generator that accumulates all output in alist and yields the lists when the VM halts
+        '''
+        while not self.halted:
+            self.out_queue = []
+            for i in self._run():
+                self.out_queue.append(i)
+            args = yield (self.out_queue)
+            self.push_in(*args)
+
+
+    def run_pack(self, *args):
+        '''
+        Function that runs _run_pack generator
+        Meant to be used as:
+        > while True:
+        >     try:
+        >         x, y = vm.run(pack)
+        >     except StopIteration:
+        >         break
+        '''
+        try:
+            # Apply func on the stream
+            return self.gen.send(args)
+        except AttributeError:
+            self.gen = self._run_pack()
+            self.gen.send(None)
+            return self.gen.send(args)

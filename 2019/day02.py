@@ -9,7 +9,7 @@ def run_noun_verb(noun, verb, exe):
     exe[1] = noun
     exe[2] = verb
     vm = VM(exe)
-    vm.run_pack()
+    vm.run()
     return vm.memory[0]
 
 def part1(exe):
