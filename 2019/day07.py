@@ -1,30 +1,46 @@
 #!/usr/bin/env python3
 
 import argparse
-from collections import deque
 from itertools import permutations
 from lib.intcode import VM
+import pdb, pudb
 
 
 # Poor man's scheduler
 def run(permutation, exe):
     vms = [ VM(exe) for _ in permutation ]
 
-    # Connect the vms (out[i] -> input[i+1]) in daisy chain
-    for i in range(len(vms)):
-        vms[i].register_stream_func(vms[(i+1) % len(vms)].push_in)
-
     # Push in the permutation
     for vm, p in zip(vms, permutation):
         vm.push_in(p)
 
-    # Push in the signal 0
+    # Send signal to the vm
     vms[0].push_in(0)
 
-    # Run the poor man's scheduler
-    while not vms[-1].halted:
+    #
+    # Run the poor man's scheduler, as soon as an output is produced, manually
+    # push it to the next vm.
+    #
+    # Therefore we are resilient to the case where:
+    #     - last vm is waiting for a single input
+    #     - vm before last sent the input and entered an infinite loop
+    #
+
+    conn = None # connection between the vms
+    out = 0     # running output of last vm
+
+    while not vms[1].is_halted():
         for vm in vms:
-            out = vm.run()
+            # Push the previous connput
+            if conn is not None:
+                vm.push_in(conn)
+                conn = None
+            try:
+                conn = next(vm.run())
+                if vm == vms[-1] and conn is not None:
+                    out = conn
+            except StopIteration: # vm halted 
+                pass
     return out
 
 def part1(exe):

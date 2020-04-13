@@ -9,7 +9,11 @@ def run_noun_verb(noun, verb, exe):
     exe[1] = noun
     exe[2] = verb
     vm = VM(exe)
-    vm.run()
+    while True:
+        try:
+            _ = next(vm.run(1))
+        except StopIteration:
+            break
     return vm.memory[0]
 
 def part1(exe):

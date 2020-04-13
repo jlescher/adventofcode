@@ -2,6 +2,7 @@
 
 import logging
 from collections import defaultdict, deque
+import pdb, pudb
 
 #logging.basicConfig(level=logging.DEBUG)
 
@@ -19,7 +20,6 @@ class VM:
         self.reset_memory(exe)
 
         # Internals
-        self.pending = False
         self.inc_pc  = None         # updated by jump instruction to skip pc increment
 
         self.opcodes = {
@@ -41,6 +41,8 @@ class VM:
                 2: { 'debug_str': 'r', 'func': lambda x: self.rel_base + self.memory[x] },
                 }
 
+        self.gen = self._run()
+
     def add(self, a, b, c):
         self.memory[c] = self.memory[a] + self.memory[b]
 
@@ -52,12 +54,15 @@ class VM:
             self.memory[a] = self.in_queue.pop()
         except IndexError:
             # input queue is empty
-            # run should hand-off control
-            self.pending = True
-            self.inc_pc = False
+            # try to capture input
+            inp = yield
+            if inp == None:
+                self.inc_pc = False
+            else:
+                self.push_in(inp)
 
     def output(self, a):
-        self.out = self.memory[a]
+        yield self.memory[a]
 
     def jump_if_true(self, a, b):
         if self.memory[a]:
@@ -103,6 +108,8 @@ class VM:
                 params.append(param)
 
         # Logging 
+        if opcode == 99:
+            pass
         instruction = [ self.memory[x] for x in range(self.pc, self.pc + n_param + 1) ]
         logging.debug('-'*80)
         logging.debug('pc: ' + str(self.pc))
@@ -113,7 +120,10 @@ class VM:
 
         # Execute
         self.inc_pc = True # by default: increment pc
-        self.opcodes[opcode]['func'](*params)
+        if opcode in (3, 4):
+            yield from self.opcodes[opcode]['func'](*params)
+        else:
+            self.opcodes[opcode]['func'](*params)
 
         # Logging after execution
         logging.debug('mem  instruction: ' + '{:>12s} '.format(self.opcodes[opcode]['func'].__name__) + ''.join(map( lambda x: ' {:4d}'.format(self.memory[x]), params)))
@@ -130,82 +140,18 @@ class VM:
     def push_in(self, *args):
         for a in args:
             self.in_queue.appendleft(a)
-        if args:
-            self.pending = False
 
     def _run(self):
         '''
         Generator that yields each output as soon as it can.
-        Runs until VM is halted or no input can be fetched.
-        '''
-        while not self.halted and not self.pending:
-            self.execute_instruction()
-            if self.out is not None:
-                yield self.out
-                self.out = None
-
-    def register_stream_func(self, func=None):
-        self.func = func
-
-    def run_stream(self, *args):
-        '''
-        Generator that yields each output as a stream as soon as it is available.
-        Meant to be used with:
-        > for out in vm.run_stream():
-        '''
-        if args:
-            self.push_in(*args)
-
-        for i in self._run():
-            try:
-                # Apply func on the stream
-                self.func(i)
-            except AttributeError:
-                pass
-            yield i
-
-    def run(self, *args):
-        '''
-        Function that runs until the VM halts and return the last output value
-        Default to the returning the content of memory[0] if no output value
-        Meant to be used with:
-        > out = vm.run()
-        '''
-        if args:
-            self.push_in(*args)
-        for i in self.run_stream():
-            out = i
-        try:
-            return i
-        except UnboundLocalError:
-            return self.memory[0]
-
-    def _run_pack(self):
-        '''
-        Generator that accumulates all output in alist and yields the lists when the VM halts
+        Runs until VM is halted.
         '''
         while not self.halted:
-            self.out_queue = []
-            for i in self._run():
-                self.out_queue.append(i)
-            args = yield (self.out_queue)
-            self.push_in(*args)
+            yield from self.execute_instruction()
 
-
-    def run_pack(self, *args):
-        '''
-        Function that runs _run_pack generator
-        Meant to be used as:
-        > while True:
-        >     try:
-        >         x, y = vm.run(pack)
-        >     except StopIteration:
-        >         break
-        '''
-        try:
-            # Apply func on the stream
-            return self.gen.send(args)
-        except AttributeError:
-            self.gen = self._run_pack()
-            self.gen.send(None)
-            return self.gen.send(args)
+    def run(self, *args):
+        self.push_in(*args)
+        return self.gen
+    
+    def is_halted(self):
+        return self.halted
