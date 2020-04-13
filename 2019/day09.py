@@ -12,8 +12,20 @@ if __name__ == '__main__':
     with open(args.input) as f:
         exe = list(map(int, f.readline().split(',')))
 
-    vm = VM(exe)
-    print('part1: {}'.format(vm.run(1)))
+    vm = VM(exe).run(1)
+    while True:
+        try:
+            out = next(vm)
+        except StopIteration:
+            break
 
-    vm = VM(exe)
-    print('part1: {}'.format(vm.run(2)))
+    print('part1: {}'.format(out))
+
+    vm = VM(exe).run(2)
+    while True:
+        try:
+            out = next(vm)
+        except StopIteration:
+            break
+
+    print('part2: {}'.format(out))

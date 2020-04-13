@@ -5,8 +5,6 @@ from collections import deque
 from lib.intcode import VM
 import matplotlib.pyplot as plt
 
-import pdb
-
 class Robot:
     BLACK = 0
     WHITE = 1
@@ -29,7 +27,9 @@ class Robot:
     def paint(self):
         while True:
             try:
-                color, direc = self.vm.run_pack(self.panel.get(self.pos, self.BLACK))
+                self.vm.push_in(self.panel.get(self.pos, self.BLACK))
+                color = next(self.vm.run())
+                direc = next(self.vm.run())
             except StopIteration:
                 break
 

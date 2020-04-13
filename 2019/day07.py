@@ -3,7 +3,6 @@
 import argparse
 from itertools import permutations
 from lib.intcode import VM
-import pdb, pudb
 
 
 # Poor man's scheduler
