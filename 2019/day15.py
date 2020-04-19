@@ -283,4 +283,3 @@ if __name__ == '__main__':
     droid.dfs()
     print('part1: {}'.format(droid.bfs_to_oxygen()))
     print('part2: {}'.format(droid.bfs_from_oxygen()))
-

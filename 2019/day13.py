@@ -102,4 +102,3 @@ if __name__ == '__main__':
     arcade = Arcade(exe)
     score = arcade.play()
     print('part2: {}'.format(score))
-
